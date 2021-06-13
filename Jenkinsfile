@@ -37,6 +37,7 @@ pipeline {
                 echo 'Testing the build...'
                 sh "chmod +x -R ${env.WORKSPACE}"
                 sh './test.sh'
+                sh 'npm test'
             }
         }
         stage('Deliver') {
