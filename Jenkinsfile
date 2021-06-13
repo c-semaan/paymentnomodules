@@ -42,6 +42,7 @@ pipeline {
         stage('Deliver') {
             steps {
                 echo "Delvering version ${params.VERSION}..."
+                npm test
                 sh './deliver.sh'
                 input message: 'Finished using the web site? (Click "Proceed" to continue)'
                 sh './kill.sh'
