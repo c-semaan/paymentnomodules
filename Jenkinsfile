@@ -15,6 +15,7 @@ pipeline {
         CI = 'true'
     }
     stages {
+        CODE_CHANGES = getGitChanges()
         stage('Build') {
             when {
                 expression {
@@ -24,6 +25,7 @@ pipeline {
             steps {
                 echo "Building the application version ${NEW_VERSION} ..."
                 sh 'npm install'
+                sh 'exit 0'
             }
         }
         stage('Test') {
@@ -38,6 +40,17 @@ pipeline {
                 sh "chmod +x -R ${env.WORKSPACE}"
                 sh './test.sh'
                 sh 'npm test'
+                try {
+                    sh 'npm test' 
+               
+                } catch (Exception err) {
+                currentBuild.result = 'UNSTABLE' // Я могу либо здесь полностью провалить сборку с этим.
+                sh "exit 1" // Это помечает код как неудачный.
+                }
+                
+                                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
+                    sh "exit 1"
+                }
             }
         }
         stage('Deliver') {
